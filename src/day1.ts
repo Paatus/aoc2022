@@ -1,15 +1,9 @@
-import {readFileSync} from 'fs';
-import { compose, drop, head, map, pipe, prop, sort, sortBy, sum, take, takeWhile } from 'ramda';
+import { compose, drop, head, map, prop, sort, sum, take, takeWhile } from 'ramda';
+import {readFile} from './utils';
 
 interface Elf {
     totalCalories: number;
     foodCalories: number[];
-}
-
-const readFile = (path: string) => {
-    const fileContents = readFileSync(path, "utf-8");
-
-    return fileContents;
 }
 
 const parseInput = (input: string[], acc: Elf[] = []): Elf[] => {
