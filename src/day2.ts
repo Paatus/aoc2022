@@ -44,6 +44,15 @@ const outcomeScore = (outcome: Outcome): number => {
 
 }
 
+const toMyHand = (move: Move): MyHand => {
+    const map: Record<Move, MyHand> = {
+        PAPER: 'Y',
+        ROCK: 'X',
+        SCISSORS: 'Z'
+    }
+    return map[move];
+}
+
 const getOutcome = (game: Game): Outcome => {
     const [opp, mine] = game.split(" ");
 
@@ -56,6 +65,28 @@ const getOutcome = (game: Game): Outcome => {
     return map[toMove(opp as Hand)][toMove(mine as Hand)];
 }
 
+const getBestMove = (opp: OpponentHand, desiredOutcome: Outcome): Move => {
+    const map: Record<Move, Record<Outcome, Move>> = {
+        'ROCK': { WIN: 'PAPER', LOSE: 'SCISSORS', DRAW: 'ROCK' },
+        'PAPER': { WIN: 'SCISSORS', LOSE: 'ROCK', DRAW: 'PAPER' },
+        'SCISSORS': { WIN: 'ROCK', LOSE: 'PAPER', DRAW: 'SCISSORS' }
+    }
+    return map[toMove(opp)][desiredOutcome];
+}
+
+const getMyMove2 = (game: Game) => {
+    const map: Record<MyHand, Outcome> = {
+        X: "LOSE",
+        Y: "DRAW",
+        Z: "WIN"
+    }
+    const [opp, mine] = game.split(" ");
+
+    const wantedOutcome = map[mine as MyHand];
+
+    return getBestMove(opp as OpponentHand, wantedOutcome);
+};
+
 const getMyMove = (game: Game): Move => {
     const [_, mine] = game.split(" ");
 
@@ -66,16 +97,26 @@ const getScore = (game: Game): number => {
     return MoveScore(getMyMove(game)) + outcomeScore(getOutcome(game));
 }
 
+const getScore2 = (game: Game): number => {
+    const myMove = getMyMove2(game);
+    const [opp, ] = game.split(" ")
+    const desiredGame: Game = `${opp as OpponentHand} ${toMyHand(myMove)}`
+    return MoveScore(getMyMove2(game)) + outcomeScore(getOutcome(desiredGame));
+}
+
 const solve1 = (input: Game[]): number => {
     return sum(input.map(getScore))
 }
 
+const solve2 = (input: Game[]): number => {
+    return sum(input.map(getScore2))
+}
+
 const main = () => {
     const contents = readFile("inputs/day2.txt");
-    console.log("contents", contents);
-    const games = contents.split('\n') as Game[];
+    const games = contents.split('\n').filter(Boolean) as Game[];
 
-    console.log(solve1(games));
+    console.table({ part1: solve1(games), part2: solve2(games) });
 }
 
 main();
